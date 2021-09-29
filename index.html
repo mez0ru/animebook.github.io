@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Animebook</title>
+    <meta name="mobile-web-app-capable" content="yes">
     <style>
       html,
       body,
@@ -706,15 +707,18 @@
         <div class="app-container" :style="calcAppStyle()" v-cloak>
           <div class="video-subtitles-missing hint" v-show="!videoUrl && !captionsUrl">
             Drag-and-drop a video file and subtitle file to this page
+            <input type="file" multiple @change="onFileInputted">
           </div>
           <div class="video-missing" v-show="!videoUrl && captionsUrl && !shouldShowVideoError">
             <div class="hint">
               Drag-and-drop a video file
+              <input type="file" multiple @change="onFileInputted">
             </div>
           </div>
           <div class="subtitles-missing" v-show="videoUrl && !captionsUrl && !shouldShowSubtitlesError">
             <div class="hint">
             Drag-and-drop a subtitles file<br />(vtt, srt or ass)
+            <input type="file" multiple @change="onFileInputted">
             </div>
           </div>
           <div class="video-error" v-show="shouldShowVideoError">
@@ -747,7 +751,7 @@
               @timeupdate="onTimeUpdate"
               crossorigin="anonymous"
               controls
-              disablePictureInPicture
+              autoPictureInPicture
               disabled
               tabIndex="-1"
               @focus="onVideoFocus"
@@ -846,7 +850,7 @@
           <div v-if="captionsUrl && !isOffsetMode" :class="controlsExpandClass" @click="toggleControls()"></div>
           <div class="auto-pause-text unselectable" v-if="isAutoPauseMode">Auto Pause <span style="display: inline-block;">:</span><span v-html="autoPauseIcon"></span></div>
           <div v-if="captionsUrl" class="controls" :style="controlsStyle">
-            <a tabindex="1" :class="offsetButtonClass" @click="toggleOffsetMode()"><span>{{this.isOffsetMode ? 'Cancel' : 'Offset Subtitles'}}</span></a>
+            <a tabindex="1" :class="offsetButtonClass" @click="toggleOffsetMode"><span>{{this.isOffsetMode ? 'Cancel' : 'Offset Subtitles'}}</span></a>
             <input form="novalidatedform" type="number" step="0.1" tabindex="2" @keydown="onInputKeyDown" class="offset-input" v-model="subtitlesOffsetInput"></input>
             <a v-if="audioTracks && audioTracks.length > 1" tabindex="3" :class="audioTrackClass" @click="cycleAudioTrack()"><span>{{selectedAudioTrack + 1}}/{{audioTracks.length}}</span></a>
             <a tabindex="4" :class="helpClass" @click="toggleHelp(); enableHelpMode('hotkeys')"><span>?</span></a>
@@ -971,6 +975,7 @@
           skipNextAutoPause: false,
           lastPauseTime: 0.0,
           isPlaying: false,
+          isMobile: false,
           notifyText: null,
           notifyCount: 0,
           shouldShowHelpPopup: false,
@@ -1135,10 +1140,14 @@
             if (!this.cursorVisible && this.isPlaying)
               return "cursor: none;";
             return "";
-          }
+          },
         },
         created: function () {
           var self = this;
+          if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+            console.log('you are on mobile');
+            self.isMobile = true;
+          }
           window.addEventListener('keydown', function (e) {
             if (!self.videoUrl || !self.captionsUrl || self.shouldShowSubtitlesError || self.shouldShowVideoError)
               return;
@@ -1445,7 +1454,7 @@
           },
 
           toggleSidebar: function () {
-            if (this.sideBarX <= 0.99) {
+            if (this.sideBarX <= 0.99 || this.isMobile) {
               this.previousSideBarX = this.sideBarX;
               this.sideBarX = 1.00;
             } else {
@@ -1480,6 +1489,19 @@
             }
           },
 
+          onFileInputted: function (e) {
+            const inputSelector = e.target || e.srcElement;;
+            for (var i = 0; i < inputSelector.files.length; i++) {
+              var file = inputSelector.files[i];
+              this.isCaptions(file)
+                ? this.loadCaptions(file)
+                : this.loadVideo(file);
+            }
+
+            if (this.isMobile)
+              this.toggleSidebar();
+          },
+
           onInputKeyDown: function (event) {
             switch (event.key) {
               case 'ArrowLeft':
@@ -1500,6 +1522,12 @@
             this.shouldShowVideoError = false;
             this.videoErrorMessage = null;
             this.videoFileName = file.name;
+
+            if (this.captionsUrl != null && this.videoUrl != null){
+              const div = document.getElementsByClassName('video-container')[0];
+              if (div.requestFullscreen) 
+                div.requestFullscreen();
+              }
           },
 
           onVideoError: function (event) {
@@ -2023,6 +2051,12 @@
               if (self.sideBarX > 0.99)
                 self.toggleSidebar();
             };
+
+            if (this.captionsUrl != null && this.videoUrl != null){
+              const div = document.getElementsByClassName('video-container')[0];
+              if (div.requestFullscreen) 
+                div.requestFullscreen();
+              }
           },
 
           assToCaptions: function (text) {
