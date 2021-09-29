@@ -1523,7 +1523,7 @@
             this.videoErrorMessage = null;
             this.videoFileName = file.name;
 
-            if (this.captionsUrl != null && this.videoUrl != null){
+            if (this.isMobile && this.captionsUrl != null && this.videoUrl != null){
               const div = document.getElementsByClassName('video-container')[0];
               if (div.requestFullscreen) 
                 div.requestFullscreen();
@@ -2052,7 +2052,7 @@
                 self.toggleSidebar();
             };
 
-            if (this.captionsUrl != null && this.videoUrl != null){
+            if (this.isMobile && this.captionsUrl != null && this.videoUrl != null){
               const div = document.getElementsByClassName('video-container')[0];
               if (div.requestFullscreen) 
                 div.requestFullscreen();
