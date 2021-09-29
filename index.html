@@ -1919,7 +1919,14 @@
             if (previousSelectedAudioTrack && previousSelectedAudioTrack < this.audioTracks.length && areNewTracksSameCount)
               this.selectedAudioTrack = previousSelectedAudioTrack;
             else
-              this.selectedAudioTrack = 0;
+            {
+              for (var i = 0; i < this.audioTracks.length; i++){
+                if (this.audioTracks[i].language == 'jpn'){
+                  this.selectedAudioTrack = i;
+                  break;
+                } this.selectedAudioTrack = 0;
+              }
+            }
             this.enableAudioTrack(this.selectedAudioTrack);
           },
 
