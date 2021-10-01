@@ -756,6 +756,8 @@
               tabIndex="-1"
               @focus="onVideoFocus"
               @click.stop.prevent="onVideoClick"
+              @touchstart="onVideoClick"
+              @play="onPlay"
               @seeked="onVideoSeek"
               @loadeddata="onVideoLoad"
               :key="videoKey"
@@ -1454,7 +1456,7 @@
           },
 
           toggleSidebar: function () {
-            if (this.sideBarX <= 0.99 || this.isMobile) {
+            if (this.sideBarX <= 0.99) {
               this.previousSideBarX = this.sideBarX;
               this.sideBarX = 1.00;
             } else {
@@ -1497,9 +1499,6 @@
                 ? this.loadCaptions(file)
                 : this.loadVideo(file);
             }
-
-            if (this.isMobile)
-              this.toggleSidebar();
           },
 
           onInputKeyDown: function (event) {
@@ -1522,12 +1521,6 @@
             this.shouldShowVideoError = false;
             this.videoErrorMessage = null;
             this.videoFileName = file.name;
-
-            if (this.isMobile && this.captionsUrl != null && this.videoUrl != null){
-              const div = document.getElementsByClassName('video-container')[0];
-              if (div.requestFullscreen) 
-                div.requestFullscreen();
-              }
           },
 
           onVideoError: function (event) {
@@ -1540,12 +1533,25 @@
           },
 
           onVideoClick: function (event) {
-            const video = document.getElementById('ab-video-element');
-            if (video.paused)
-              video.play();
+            if (event.target.paused)
+              event.target.play();
             else
-              video.pause();
+              event.target.pause();
             this.clearSelection();
+          },
+
+          onPlay: function (event) {
+            if (this.isMobile){
+              const div = document.getElementsByClassName('video-container')[0];
+              if (div.requestFullscreen)
+                div.requestFullscreen();
+              else if (div.msRequestFullscreen)
+                div.msRequestFullscreen();
+              else if (div.mozRequestFullScreen)
+                div.mozRequestFullScreen();
+              else if (div.webkitRequestFullscreen)
+                div.webkitRequestFullscreen();
+            }
           },
 
           onVideoSeek: function (event) {
@@ -2063,12 +2069,6 @@
               if (self.sideBarX > 0.99)
                 self.toggleSidebar();
             };
-
-            if (this.isMobile && this.captionsUrl != null && this.videoUrl != null){
-              const div = document.getElementsByClassName('video-container')[0];
-              if (div.requestFullscreen) 
-                div.requestFullscreen();
-              }
           },
 
           assToCaptions: function (text) {
