@@ -23,6 +23,10 @@
         background-color: #000;
       }
 
+      video::-webkit-media-controls-panel {
+        background-image: linear-gradient(transparent, transparent) !important;
+      }
+
       .current-caption, .notify-text {
         color: #DADADA;
         paint-order: stroke;
@@ -749,9 +753,9 @@
               :src="videoUrl"
               @error="onVideoError"
               @timeupdate="onTimeUpdate"
-              crossorigin="anonymous"
               controls
               disablePictureInPicture
+              crossorigin="anonymous"
               disabled
               tabIndex="-1"
               @focus="onVideoFocus"
@@ -1541,7 +1545,7 @@
           },
 
           onPlay: function (event) {
-            if (this.isMobile){
+            if (this.isMobile && document.fullscreenElement == null){
               const div = document.getElementsByClassName('video-container')[0];
               if (div.requestFullscreen)
                 div.requestFullscreen();
