@@ -755,7 +755,7 @@
               disabled
               tabIndex="-1"
               @focus="onVideoFocus"
-              @click="onVideoClick"
+              @click.stop.prevent="onVideoClick"
               @seeked="onVideoSeek"
               @loadeddata="onVideoLoad"
               :key="videoKey"
@@ -1540,6 +1540,11 @@
           },
 
           onVideoClick: function (event) {
+            const video = document.getElementById('ab-video-element');
+            if (video.paused)
+              video.play();
+            else
+              video.pause();
             this.clearSelection();
           },
 
