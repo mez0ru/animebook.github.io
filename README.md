@@ -1,3 +1,13 @@
+This is an improvement over the original project, all rights goes to the original author.
+This fork focus on the mobile experience, although it is still rough around the edges, it's much better than the original, which at the time did not work at all with any mobile device, things have changed a little bit since then, but it still lacks behind in my opinion.
+
+Improvements:
+1. No annoying black gradient around the player.
+2. Subtitle placement is a little bit higher.
+3. Player's pause / resume response is much faster (instantaneous).
+
+Other improvements are miner, you can track changes through the github commits that I did.
+
 # Animebook
 https://animebook.github.io
 
